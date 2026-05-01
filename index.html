@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peekaboo — Digital Exposure Survey</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0F0F0E;
+    --ink-soft: #3A3A38;
+    --ink-muted: #7A7A76;
+    --ink-faint: #B8B8B3;
+    --surface: #F7F6F2;
+    --surface-raised: #FFFFFF;
+    --surface-subtle: #EFEDE7;
+    --accent: #2A1F6B;
+    --accent-mid: #5546C8;
+    --accent-light: #EDEAFB;
+    --accent-glow: rgba(85, 70, 200, 0.12);
+    --positive: #1A5C4A;
+    --positive-light: #E4F4EE;
+    --warn-light: #FAEEDA;
+    --warn: #EF9F27;
+    --warn-ink: #633806;
+    --border: #E2DFDA;
+    --border-strong: #C4C0B8;
+    --error: #B91C1C;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-pill: 100px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--surface);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .page-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  /* ── HEADER ── */
+  .survey-header { margin-bottom: 40px; }
+  .sticky-bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    margin: 0 -24px 24px;
+    padding: 14px 24px;
+  }
+  .header-meta {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .progress-wrap { display: flex; align-items: center; gap: 8px; }
+  .progress-track {
+    width: 100px; height: 4px;
+    background: var(--border);
+    border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: var(--accent-mid);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label { font-size: 11px; color: var(--ink-muted); white-space: nowrap; }
+
+  .survey-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-light);
+    border: 0.5px solid #C4BCE8;
+    border-radius: var(--radius-pill);
+    padding: 4px 12px; margin-bottom: 14px;
+  }
+  .eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-mid); }
+
+  .survey-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(26px, 4vw, 34px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .survey-title em { font-style: italic; color: var(--accent-mid); }
+  .survey-intro {
+    font-size: 15px; color: var(--ink-soft);
+    line-height: 1.65; font-weight: 300;
+    margin-bottom: 10px;
+  }
+  .survey-time {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; color: var(--ink-muted);
+    background: var(--surface-subtle);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 3px 10px;
+  }
+
+  /* ── QUESTION BLOCKS ── */
+  .q-block {
+    background: var(--surface-raised);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .q-block:focus-within { box-shadow: var(--shadow-md); border-color: #C4BCE8; }
+  .q-block.error { border-color: var(--error); }
+
+  .q-number {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent-mid);
+    margin-bottom: 6px;
+  }
+  .q-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    line-height: 1.35;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .q-hint {
+    font-size: 12px; color: var(--ink-muted);
+    margin-bottom: 16px; font-weight: 300;
+  }
+
+  /* ── CHIPS ── */
+  .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-pill);
+    font-size: 13px; font-weight: 400;
+    color: var(--ink-soft);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--accent-mid); color: var(--accent); background: var(--accent-light); }
+  .chip.selected {
+    background: var(--accent-light);
+    border-color: var(--accent-mid);
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .chip.selected::before { content: '✓ '; font-size: 11px; }
+
+  /* counter chip styling */
+  .chip-count[data-count]:not([data-count="0"]) {
+    background: var(--accent-light);
+    border-color: var(--accent-mid);
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .chip-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent-mid);
+    color: #fff;
+    font-size: 11px; font-weight: 600;
+    margin-left: 4px;
+  }
+
+  /* ── SCALE ── */
+  .scale-row { display: flex; gap: 8px; justify-content: space-between; width: 100%; }
+  .scale-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--ink-muted);
+    margin-top: 8px; padding: 0 2px;
+  }
+  .scale-btn {
+    width: 44px; height: 44px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 14px; font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .scale-btn:hover { border-color: var(--accent-mid); background: var(--accent-light); color: var(--accent); }
+  .scale-btn.selected { background: var(--accent-mid); border-color: var(--accent-mid); color: #fff; font-weight: 600; }
+
+  /* ── INPUTS ── */
+  .survey-textarea, .survey-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    outline: none;
+    line-height: 1.6;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .survey-textarea { resize: vertical; min-height: 80px; }
+  .survey-textarea:focus, .survey-input:focus {
+    border-color: var(--accent-mid);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .survey-textarea::placeholder, .survey-input::placeholder {
+    color: var(--ink-faint); font-style: italic;
+  }
+
+  /* ── YES/NO ROW ── */
+  .yesno-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .yesno-btn {
+    flex: 1 1 calc(33% - 10px); min-width: 140px;
+    padding: 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 14px; font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .yesno-btn:hover { border-color: var(--accent-mid); background: var(--accent-light); color: var(--accent); }
+  .yesno-btn.selected-yes { background: var(--positive-light); border-color: var(--positive); color: var(--positive); }
+  .yesno-btn.selected-no { background: var(--warn-light); border-color: var(--warn); color: var(--warn-ink); }
+  .yesno-btn.selected-unsure { background: var(--accent-light); border-color: var(--accent-mid); color: var(--accent); }
+
+  /* ── CONDITIONAL ── */
+  .conditional {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 0.5px dashed var(--border);
+    display: none;
+  }
+  .conditional.visible { display: block; }
+  .conditional-label {
+    font-size: 12px; font-weight: 500;
+    color: var(--ink-muted); margin-bottom: 8px;
+  }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 32px 0 20px;
+  }
+  .section-divider-line { flex: 1; height: 0.5px; background: var(--border); }
+  .section-divider-label {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  /* ── EMAIL BLOCK ── */
+  .email-block { background: var(--surface-raised); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+  .email-label { font-family: 'DM Serif Display', serif; font-size: 18px; line-height: 1.35; color: var(--ink); margin-bottom: 6px; }
+  .email-hint { font-size: 12px; color: var(--ink-muted); margin-bottom: 12px; font-weight: 300; }
+
+  /* ── SUBMIT ── */
+  .submit-zone {
+    background: var(--surface-raised);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    margin-top: 8px;
+  }
+  .submit-heading { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink); margin-bottom: 8px; }
+  .submit-sub { font-size: 13px; color: var(--ink-muted); margin-bottom: 20px; font-weight: 300; }
+  .submit-btn {
+    background: var(--accent);
+    color: #fff; border: none;
+    border-radius: var(--radius-sm);
+    padding: 13px 36px;
+    font-size: 15px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(42,31,107,0.3);
+    transition: background 0.2s, box-shadow 0.2s, opacity 0.2s;
+  }
+  .submit-btn:hover:not(:disabled) { background: var(--accent-mid); box-shadow: 0 4px 16px rgba(42,31,107,0.4); }
+  .submit-btn:disabled { opacity: 0.6; cursor: wait; }
+  .submit-error {
+    color: var(--error); font-size: 13px; margin-top: 12px; min-height: 18px;
+  }
+
+  /* ── THANK YOU ── */
+  .thankyou { display: none; text-align: center; padding: 60px 24px; }
+  .thankyou.visible { display: block; }
+  .ty-icon { font-size: 44px; margin-bottom: 16px; }
+  .ty-heading { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--ink); margin-bottom: 12px; }
+  .ty-sub { font-size: 14px; color: var(--ink-soft); font-weight: 300; line-height: 1.65; max-width: 460px; margin: 0 auto; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .survey-header, .q-block, .email-block, .submit-zone { animation: fadeUp 0.4s ease both; }
+</style>
+</head>
+<body>
+
+<div class="page-wrap" id="page-wrap">
+
+  <!-- STICKY PROGRESS BAR -->
+  <div class="sticky-bar">
+    <div class="header-meta">
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-label" id="progress-label">0 of 10</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div class="survey-header">
+    <div class="survey-eyebrow"><div class="eyebrow-dot"></div><span>Research — Digital Exposure &amp; Habits</span></div>
+    <h1 class="survey-title">How exposed are you, <em>really?</em></h1>
+    <p class="survey-intro">We're building a tool that gives you a clear picture of your digital exposure. Before we do, we want to understand how you think about it today — what you use, how often you check, and where the gaps are. Takes about 4 minutes.</p>
+    <div class="survey-time">⏱ <span>4 minutes · 10 questions · No sign-up needed</span></div>
+  </div>
+
+  <form id="survey-form" novalidate>
+
+    <!-- SECTION: YOUR SETUP -->
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <div class="section-divider-label">Your setup</div>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <!-- Q1 DEVICES (counter chips) -->
+    <div class="q-block" data-q="q1">
+      <div class="q-number">Question 1 of 10</div>
+      <div class="q-text">Which devices do you use regularly?</div>
+      <div class="q-hint">Tap to select — tap again to add more of the same device. Up to 5 per type.</div>
+      <div class="chip-grid" id="q1-chips" data-mode="count">
+        <div class="chip chip-count" data-count="0" data-label="📱 Smartphone">📱 Smartphone</div>
+        <div class="chip chip-count" data-count="0" data-label="💻 Laptop">💻 Laptop</div>
+        <div class="chip chip-count" data-count="0" data-label="🖥️ Desktop">🖥️ Desktop</div>
+        <div class="chip chip-count" data-count="0" data-label="⌚ Smartwatch">⌚ Smartwatch</div>
+        <div class="chip chip-count" data-count="0" data-label="📺 Smart TV">📺 Smart TV</div>
+        <div class="chip chip-count" data-count="0" data-label="🎮 Games console">🎮 Games console</div>
+        <div class="chip chip-count" data-count="0" data-label="🏠 Smart home devices">🏠 Smart home devices</div>
+        <div class="chip chip-count" data-count="0" data-label="💼 Separate work device">💼 Separate work device</div>
+        <div class="chip chip-count" data-count="0" data-label="📡 Home router">📡 Home router</div>
+        <div class="chip chip-count" data-count="0" data-label="👓 Smart glasses">👓 Smart glasses</div>
+        <div class="chip chip-count" data-count="0" data-label="💍 Wearables (e.g. Oura ring)">💍 Wearables (e.g. Oura ring)</div>
+      </div>
+    </div>
+
+    <!-- Q2 SECURITY TOOLS (multi) -->
+    <div class="q-block" data-q="q2">
+      <div class="q-number">Question 2 of 10</div>
+      <div class="q-text">Which of these security or privacy tools do you currently use?</div>
+      <div class="q-hint">Select all that apply — free or paid, active or occasionally</div>
+      <div class="chip-grid" id="q2-chips" data-mode="multi">
+        <div class="chip">🔐 Password manager</div>
+        <div class="chip">🌐 VPN</div>
+        <div class="chip">🔑 Two-factor auth app</div>
+        <div class="chip">🦠 Antivirus software</div>
+        <div class="chip">🔔 Breach scanner (e.g. HaveIBeenPwned)</div>
+        <div class="chip">📧 Private / encrypted email</div>
+        <div class="chip">🕵️ Dark web monitoring</div>
+        <div class="chip">❌ None of the above</div>
+      </div>
+    </div>
+
+    <!-- Q3 PAY (yes/no + conditional) -->
+    <div class="q-block" data-q="q3">
+      <div class="q-number">Question 3 of 10</div>
+      <div class="q-text">Do you pay for any of those tools?</div>
+      <div class="q-hint">This includes subscriptions and in-app purchases of any value.</div>
+      <div class="yesno-row" data-yesno="q3">
+        <div class="yesno-btn" data-value="Yes" data-type="yes" data-reveal="q3-followup">Yes</div>
+        <div class="yesno-btn" data-value="No, free tools only" data-type="no">No, free tools only</div>
+        <div class="yesno-btn" data-value="Not intentionally" data-type="unsure">Not intentionally</div>
+      </div>
+      <div class="conditional" id="q3-followup">
+        <div class="conditional-label">Roughly how much per month across all of them?</div>
+        <div class="chip-grid" id="q3p-chips" data-mode="single">
+          <div class="chip">Under £5</div>
+          <div class="chip">£5–10</div>
+          <div class="chip">£10–20</div>
+          <div class="chip">£20+</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION: HABITS -->
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <div class="section-divider-label">Your habits</div>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <!-- Q4 FREQUENCY (single) -->
+    <div class="q-block" data-q="q4">
+      <div class="q-number">Question 4 of 10</div>
+      <div class="q-text">How often do you proactively check your digital security?</div>
+      <div class="q-hint">Checking HaveIBeenPwned, reviewing app permissions, updating passwords, running a scan — anything intentional</div>
+      <div class="chip-grid" id="q4-chips" data-mode="single">
+        <div class="chip">📅 Daily or almost daily</div>
+        <div class="chip">📆 Weekly</div>
+        <div class="chip">🗓️ Monthly or so</div>
+        <div class="chip">🔍 If I think something has happened</div>
+        <div class="chip">⚠️ Only after I am informed something happened</div>
+        <div class="chip">🤷 Rarely or never</div>
+      </div>
+    </div>
+
+    <!-- Q5 TRIGGER (single) -->
+    <div class="q-block" data-q="q5">
+      <div class="q-number">Question 5 of 10</div>
+      <div class="q-text">What usually prompts you to check?</div>
+      <div class="q-hint">Pick the one that fits best</div>
+      <div class="chip-grid" id="q5-chips" data-mode="single">
+        <div class="chip">🔄 It's part of my regular routine</div>
+        <div class="chip">😬 Something felt off — a suspicious message, link or call</div>
+        <div class="chip">📰 I read about a breach or hack in the news</div>
+        <div class="chip">🔔 I got a breach notification from a service</div>
+        <div class="chip">🚨 I experienced a breach personally</div>
+        <div class="chip">💬 A friend or colleague mentioned it</div>
+        <div class="chip">🚫 Nothing — I don't really check</div>
+      </div>
+    </div>
+
+    <!-- Q6 HOUSEHOLD (yes/no variants + conditional textarea) -->
+    <div class="q-block" data-q="q6">
+      <div class="q-number">Question 6 of 10</div>
+      <div class="q-text">Have you ever checked the digital security of a family member?</div>
+      <div class="q-hint">Partner, child, parent — helping them with passwords, scams, permissions, anything like that</div>
+      <div class="yesno-row" data-yesno="q6">
+        <div class="yesno-btn" data-value="Yes, regularly" data-type="yes" data-reveal="q6-followup">Yes, regularly</div>
+        <div class="yesno-btn" data-value="Once or twice" data-type="unsure" data-reveal="q6-followup">Once or twice</div>
+        <div class="yesno-btn" data-value="No, but I am concerned for their security" data-type="no">No, but concerned</div>
+        <div class="yesno-btn" data-value="No, and I'm not sure about their exposure" data-type="no">No, unsure of their exposure</div>
+        <div class="yesno-btn" data-value="No, and I know they have been at risk or breached" data-type="no">No, but I know they've been at risk</div>
+      </div>
+      <div class="conditional" id="q6-followup">
+        <div class="conditional-label">Who do you tend to look out for? (e.g. elderly parent, partner, kids)</div>
+        <textarea class="survey-textarea" id="q6-text" placeholder="Elderly mum, my teenager, partner who isn't great with tech…"></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION: EXPERIENCE -->
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <div class="section-divider-label">Your experience</div>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <!-- Q7 BREACH (yes/no + always-visible textarea + conditional textarea) -->
+    <div class="q-block" data-q="q7">
+      <div class="q-number">Question 7 of 10</div>
+      <div class="q-text">Have you ever been hacked, or had your data exposed in a breach?</div>
+      <div class="q-hint">Password leaks, phishing, identity theft, or a "we regret to inform you" email from a service you use</div>
+      <div class="yesno-row" data-yesno="q7">
+        <div class="yesno-btn" data-value="Yes, definitely" data-type="yes" data-reveal="q7-followup">Yes, definitely</div>
+        <div class="yesno-btn" data-value="Probably — not sure" data-type="unsure" data-reveal="q7-followup">Probably — not sure</div>
+        <div class="yesno-btn" data-value="Not that I know of" data-type="no" data-reveal="q7-followup">Not that I know of</div>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="conditional-label">Please provide any details you are comfortable sharing</div>
+        <textarea class="survey-textarea" id="q7-text" placeholder="e.g. which service was breached, when it happened, how you found out…"></textarea>
+      </div>
+      <div class="conditional" id="q7-followup">
+        <div class="conditional-label">If so, what did you do? (If nothing has happened yet — what would you do?)</div>
+        <textarea class="survey-textarea" id="q7-action" placeholder="Changed passwords, did nothing, panicked, contacted the company, not sure what I'd do…"></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION: AWARENESS -->
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <div class="section-divider-label">Your awareness</div>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <!-- Q8 SOURCES (multi) -->
+    <div class="q-block" data-q="q8">
+      <div class="q-number">Question 8 of 10</div>
+      <div class="q-text">Where do you usually get information about online security and privacy?</div>
+      <div class="q-hint">Select all that apply</div>
+      <div class="chip-grid" id="q8-chips" data-mode="multi">
+        <div class="chip">🤖 Reddit (r/privacy, r/netsec etc.)</div>
+        <div class="chip">📰 Tech news sites</div>
+        <div class="chip">🎙️ Podcasts</div>
+        <div class="chip">📬 Email newsletters</div>
+        <div class="chip">📱 Social media</div>
+        <div class="chip">💬 Friends or colleagues</div>
+        <div class="chip">🔔 Breach / alert notifications</div>
+        <div class="chip">🏢 Work communications / training</div>
+        <div class="chip">🚫 I don't actively look for it</div>
+      </div>
+    </div>
+
+    <!-- Q9 SAFETY SCALE -->
+    <div class="q-block" data-q="q9">
+      <div class="q-number">Question 9 of 10</div>
+      <div class="q-text">How safe do you feel your current digital setup is?</div>
+      <div class="q-hint">Gut feeling is fine</div>
+      <div class="scale-row" id="q9-scale">
+        <div class="scale-btn" data-value="1">1</div>
+        <div class="scale-btn" data-value="2">2</div>
+        <div class="scale-btn" data-value="3">3</div>
+        <div class="scale-btn" data-value="4">4</div>
+        <div class="scale-btn" data-value="5">5</div>
+      </div>
+      <div class="scale-labels">
+        <span>Not safe at all</span>
+        <span>Completely safe</span>
+      </div>
+    </div>
+
+    <!-- Q10 BIGGEST GAP (open) -->
+    <div class="q-block" data-q="q10">
+      <div class="q-number">Question 10 of 10</div>
+      <div class="q-text">What's the biggest gap in how you currently manage your digital security?</div>
+      <div class="q-hint">No wrong answers — be as honest as you like. This is the most important question in the survey.</div>
+      <textarea class="survey-textarea" id="q10-text" style="min-height:100px;"
+        placeholder="e.g. I don't check it regularly enough, I don't know what to check, I have too many accounts to track, I worry more about my family than myself…"></textarea>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="email-block" data-q="email">
+      <div class="email-label">Early access to say thank you</div>
+      <div class="email-hint">In return for your time, we would like to give you early bird access to our application when we launch. We won't do anything else with the email.</div>
+      <input type="email" class="survey-input" id="email" placeholder="you@example.com" autocomplete="email" required>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-zone" id="submit-zone">
+      <div class="submit-heading">That's it — thank you.</div>
+      <div class="submit-sub">Your answers help us build something that solves a real problem, not an assumed one.</div>
+      <button type="submit" class="submit-btn" id="submit-btn">Submit my answers</button>
+      <div class="submit-error" id="submit-error"></div>
+    </div>
+  </form>
+
+  <!-- THANK YOU -->
+  <div class="thankyou" id="thankyou">
+    <div class="ty-icon">🔐</div>
+    <div class="ty-heading">You're on the list.</div>
+    <div class="ty-sub">We'll be in touch when early access opens — and we'll share what we found from everyone who took this survey. If you know someone who should fill this in, feel free to pass it on.</div>
+  </div>
+
+</div>
+
+<script>
+  // ─────────────────────────────────────────────────────────────
+  //  CONFIG — paste your Apps Script Web App URL here after deploy
+  // ─────────────────────────────────────────────────────────────
+  const SHEETS_ENDPOINT = 'PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE';
+
+  // ─── Chip behaviour ──────────────────────────────────────────
+  document.querySelectorAll('.chip-grid').forEach(grid => {
+    const mode = grid.dataset.mode;
+    grid.addEventListener('click', e => {
+      const chip = e.target.closest('.chip');
+      if (!chip || !grid.contains(chip)) return;
+
+      if (mode === 'count') {
+        let count = parseInt(chip.dataset.count) || 0;
+        count = (count >= 5) ? 0 : count + 1;
+        chip.dataset.count = count;
+        const label = chip.dataset.label;
+        chip.textContent = label;
+        if (count > 0) {
+          const badge = document.createElement('span');
+          badge.className = 'chip-badge';
+          badge.textContent = count;
+          chip.appendChild(document.createTextNode(' '));
+          chip.appendChild(badge);
+        }
+      } else if (mode === 'single') {
+        grid.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+      } else { // multi
+        chip.classList.toggle('selected');
+      }
+      updateProgress();
+    });
+  });
+
+  // ─── Yes/No behaviour ────────────────────────────────────────
+  document.querySelectorAll('[data-yesno]').forEach(row => {
+    const group = row.dataset.yesno;
+    row.addEventListener('click', e => {
+      const btn = e.target.closest('.yesno-btn');
+      if (!btn) return;
+      row.querySelectorAll('.yesno-btn').forEach(b => {
+        b.classList.remove('selected-yes','selected-no','selected-unsure');
+      });
+      btn.classList.add('selected-' + btn.dataset.type);
+
+      // Hide every conditional that belongs to this group, then reveal the right one
+      document.querySelectorAll('.conditional').forEach(c => {
+        if (c.id && c.id.startsWith(group)) c.classList.remove('visible');
+      });
+      const reveal = btn.dataset.reveal;
+      if (reveal) {
+        const cond = document.getElementById(reveal);
+        if (cond) cond.classList.add('visible');
+      }
+      updateProgress();
+    });
+  });
+
+  // ─── Scale buttons ───────────────────────────────────────────
+  document.querySelectorAll('.scale-row').forEach(row => {
+    row.addEventListener('click', e => {
+      const btn = e.target.closest('.scale-btn');
+      if (!btn) return;
+      row.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      updateProgress();
+    });
+  });
+
+  // ─── Textareas/inputs feed progress too ──────────────────────
+  document.querySelectorAll('.survey-textarea, .survey-input').forEach(el => {
+    el.addEventListener('input', updateProgress);
+  });
+
+  // ─── Progress ────────────────────────────────────────────────
+  function updateProgress() {
+    let answered = 0;
+
+    // Q1: any device count > 0
+    if ([...document.querySelectorAll('#q1-chips .chip-count')].some(c => parseInt(c.dataset.count) > 0)) answered++;
+    // Q2: at least one selected
+    if (document.querySelectorAll('#q2-chips .chip.selected').length) answered++;
+    // Q3: yes/no chosen
+    if (document.querySelector('[data-yesno="q3"] .yesno-btn[class*="selected-"]')) answered++;
+    // Q4
+    if (document.querySelector('#q4-chips .chip.selected')) answered++;
+    // Q5
+    if (document.querySelector('#q5-chips .chip.selected')) answered++;
+    // Q6
+    if (document.querySelector('[data-yesno="q6"] .yesno-btn[class*="selected-"]')) answered++;
+    // Q7
+    if (document.querySelector('[data-yesno="q7"] .yesno-btn[class*="selected-"]')) answered++;
+    // Q8
+    if (document.querySelectorAll('#q8-chips .chip.selected').length) answered++;
+    // Q9
+    if (document.querySelector('#q9-scale .selected')) answered++;
+    // Q10
+    if (document.getElementById('q10-text').value.trim().length > 5) answered++;
+
+    const pct = Math.round((answered / 10) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = answered + ' of 10';
+  }
+
+  // ─── Collect answers ─────────────────────────────────────────
+  function collectAnswers() {
+    // Q1 device counts
+    const devices = {};
+    document.querySelectorAll('#q1-chips .chip-count').forEach(c => {
+      const n = parseInt(c.dataset.count) || 0;
+      if (n > 0) devices[c.dataset.label] = n;
+    });
+
+    const multiSelected = id =>
+      [...document.querySelectorAll('#' + id + ' .chip.selected')].map(c => c.textContent.trim());
+
+    const singleSelected = id => {
+      const c = document.querySelector('#' + id + ' .chip.selected');
+      return c ? c.textContent.trim() : '';
+    };
+
+    const yesnoValue = group => {
+      const b = document.querySelector('[data-yesno="' + group + '"] .yesno-btn[class*="selected-"]');
+      return b ? b.dataset.value : '';
+    };
+
+    const scaleValue = id => {
+      const b = document.querySelector('#' + id + ' .selected');
+      return b ? b.dataset.value : '';
+    };
+
+    return {
+      submittedAt: new Date().toISOString(),
+      email: document.getElementById('email').value.trim(),
+      q1_devices: devices,
+      q2_tools: multiSelected('q2-chips'),
+      q3_pays: yesnoValue('q3'),
+      q3_amount: singleSelected('q3p-chips'),
+      q4_frequency: singleSelected('q4-chips'),
+      q5_trigger: singleSelected('q5-chips'),
+      q6_household: yesnoValue('q6'),
+      q6_who: document.getElementById('q6-text').value.trim(),
+      q7_breach: yesnoValue('q7'),
+      q7_details: document.getElementById('q7-text').value.trim(),
+      q7_action: document.getElementById('q7-action').value.trim(),
+      q8_sources: multiSelected('q8-chips'),
+      q9_safety: scaleValue('q9-scale'),
+      q10_gap: document.getElementById('q10-text').value.trim(),
+      userAgent: navigator.userAgent,
+      referrer: document.referrer || ''
+    };
+  }
+
+  // ─── Validate ────────────────────────────────────────────────
+  function validate(answers) {
+    const errors = [];
+    if (!answers.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(answers.email)) {
+      errors.push({ q: 'email', msg: 'Please enter a valid email.' });
+    }
+    if (Object.keys(answers.q1_devices).length === 0) errors.push({ q: 'q1', msg: 'Please select at least one device.' });
+    if (answers.q2_tools.length === 0) errors.push({ q: 'q2', msg: 'Please select at least one option (or "None of the above").' });
+    if (!answers.q3_pays) errors.push({ q: 'q3', msg: 'Please answer this question.' });
+    if (!answers.q4_frequency) errors.push({ q: 'q4', msg: 'Please answer this question.' });
+    if (!answers.q5_trigger) errors.push({ q: 'q5', msg: 'Please answer this question.' });
+    if (!answers.q6_household) errors.push({ q: 'q6', msg: 'Please answer this question.' });
+    if (!answers.q7_breach) errors.push({ q: 'q7', msg: 'Please answer this question.' });
+    if (answers.q8_sources.length === 0) errors.push({ q: 'q8', msg: 'Please select at least one option.' });
+    if (!answers.q9_safety) errors.push({ q: 'q9', msg: 'Please pick a number.' });
+    if (!answers.q10_gap || answers.q10_gap.length < 3) errors.push({ q: 'q10', msg: 'Please share a brief answer.' });
+    return errors;
+  }
+
+  // ─── Submit ──────────────────────────────────────────────────
+  document.getElementById('survey-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    document.querySelectorAll('.q-block.error, .email-block.error').forEach(b => b.classList.remove('error'));
+    const errEl = document.getElementById('submit-error');
+    errEl.textContent = '';
+
+    const answers = collectAnswers();
+    const errors = validate(answers);
+    if (errors.length) {
+      errors.forEach(({ q }) => {
+        const block = document.querySelector('[data-q="' + q + '"]');
+        if (block) block.classList.add('error');
+      });
+      const first = document.querySelector('.q-block.error, .email-block.error');
+      if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      errEl.textContent = errors[0].msg + (errors.length > 1 ? ' (' + (errors.length - 1) + ' more above)' : '');
+      return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    try {
+      // Apps Script Web Apps deployed as "Anyone" don't require a CORS preflight
+      // when we send text/plain. So we stringify and send as plain text.
+      const res = await fetch(SHEETS_ENDPOINT, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(answers)
+      });
+      if (!res.ok) throw new Error('Server returned ' + res.status);
+      const data = await res.json().catch(() => ({}));
+      if (data && data.ok === false) throw new Error(data.error || 'Submission failed');
+
+      document.getElementById('survey-form').style.display = 'none';
+      document.getElementById('thankyou').classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error(err);
+      btn.disabled = false;
+      btn.textContent = 'Submit my answers';
+      errEl.textContent = 'Sorry — something went wrong. Please try again in a moment.';
+    }
+  });
+</script>
+</body>
+</html>
