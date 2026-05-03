@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Peekaboo — Digital Exposure Survey</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<!-- PostHog -->
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Ei Ni init zi Gi Nr Ui Xi Hi capture calculateEventProperties tn register register_once register_for_session unregister unregister_for_session an getFeatureFlag getFeatureFlagPayload getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync ln identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty nn Qi createPersonProfile setInternalOrTestUser sn qi cn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ji debug Fr rn getPageViewId captureTraceFeedback captureTraceMetric Bi".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_whS4SCvYDgfDimGBeaHSpdF7zSbRHjmRT6zJopZ5vCj7', {
+    api_host: 'https://us.i.posthog.com',
+    defaults: '2026-01-30',
+    person_profiles: 'identified_only'
+  })
+</script>
 <style>
   :root {
     --ink: #0F0F0E;
@@ -345,7 +354,7 @@
   <div class="survey-header">
     <div class="survey-eyebrow"><div class="eyebrow-dot"></div><span>Research — Digital Exposure &amp; Habits</span></div>
     <h1 class="survey-title">How exposed are you, <em>really?</em></h1>
-    <p class="survey-intro">We're building a tool that gives you a clear picture of your digital exposure. Before we do, we want to understand how you think about it today — what you use, how often you check, and where the gaps are. Takes about 4 minutes.</p>
+    <p class="survey-intro">This June/July, we're launching a tool that gives you a clear picture of your digital exposure, different to all existing solutions on the market. We are looking for privacy conscious users to help us understand what is important to you in this space, and as a thank you, we want to invite you to be part of our Beta community ahead of a public release later this year.</p>
     <div class="survey-time">⏱ <span>4 minutes · 10 questions · No sign-up needed</span></div>
   </div>
 
@@ -408,10 +417,10 @@
       <div class="conditional" id="q3-followup">
         <div class="conditional-label">Roughly how much per month across all of them?</div>
         <div class="chip-grid" id="q3p-chips" data-mode="single">
-          <div class="chip">Under £5</div>
-          <div class="chip">£5–10</div>
-          <div class="chip">£10–20</div>
-          <div class="chip">£20+</div>
+          <div class="chip">Under $/€5</div>
+          <div class="chip">$/€5–10</div>
+          <div class="chip">$/€10–20</div>
+          <div class="chip">$/€20+</div>
         </div>
       </div>
     </div>
@@ -485,17 +494,13 @@
       <div class="q-text">Have you ever been hacked, or had your data exposed in a breach?</div>
       <div class="q-hint">Password leaks, phishing, identity theft, or a "we regret to inform you" email from a service you use</div>
       <div class="yesno-row" data-yesno="q7">
-        <div class="yesno-btn" data-value="Yes, definitely" data-type="yes" data-reveal="q7-followup">Yes, definitely</div>
-        <div class="yesno-btn" data-value="Probably — not sure" data-type="unsure" data-reveal="q7-followup">Probably — not sure</div>
-        <div class="yesno-btn" data-value="Not that I know of" data-type="no" data-reveal="q7-followup">Not that I know of</div>
+        <div class="yesno-btn" data-value="Yes, definitely" data-type="yes">Yes, definitely</div>
+        <div class="yesno-btn" data-value="Probably — not sure" data-type="unsure">Probably — not sure</div>
+        <div class="yesno-btn" data-value="Not that I know of" data-type="no">Not that I know of</div>
       </div>
       <div style="margin-top:14px;">
         <div class="conditional-label">Please provide any details you are comfortable sharing</div>
         <textarea class="survey-textarea" id="q7-text" placeholder="e.g. which service was breached, when it happened, how you found out…"></textarea>
-      </div>
-      <div class="conditional" id="q7-followup">
-        <div class="conditional-label">If so, what did you do? (If nothing has happened yet — what would you do?)</div>
-        <textarea class="survey-textarea" id="q7-action" placeholder="Changed passwords, did nothing, panicked, contacted the company, not sure what I'd do…"></textarea>
       </div>
     </div>
 
@@ -570,17 +575,27 @@
   <!-- THANK YOU -->
   <div class="thankyou" id="thankyou">
     <div class="ty-icon">🔐</div>
-    <div class="ty-heading">You're on the list.</div>
-    <div class="ty-sub">We'll be in touch when early access opens — and we'll share what we found from everyone who took this survey. If you know someone who should fill this in, feel free to pass it on.</div>
+    <div class="ty-heading">You're on the waitlist.</div>
+    <div class="ty-sub">We'll be in touch when early access opens in June — your email will not be used for anything other than the invitation. If you know someone who should fill this in, feel free to pass it on.</div>
   </div>
 
 </div>
 
 <script>
-  // ─────────────────────────────────────────────────────────────
-  //  CONFIG — paste your Apps Script Web App URL here after deploy
-  // ─────────────────────────────────────────────────────────────
-  const SHEETS_ENDPOINT = 'PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE';
+  // ─── Device chip → flat property name (so PostHog can filter on each) ───
+  const DEVICE_KEYS = {
+    '📱 Smartphone': 'device_smartphone',
+    '💻 Laptop': 'device_laptop',
+    '🖥️ Desktop': 'device_desktop',
+    '⌚ Smartwatch': 'device_smartwatch',
+    '📺 Smart TV': 'device_smart_tv',
+    '🎮 Games console': 'device_games_console',
+    '🏠 Smart home devices': 'device_smart_home',
+    '💼 Separate work device': 'device_work_device',
+    '📡 Home router': 'device_router',
+    '👓 Smart glasses': 'device_smart_glasses',
+    '💍 Wearables (e.g. Oura ring)': 'device_wearables'
+  };
 
   // ─── Chip behaviour ──────────────────────────────────────────
   document.querySelectorAll('.chip-grid').forEach(grid => {
@@ -722,7 +737,6 @@
       q6_who: document.getElementById('q6-text').value.trim(),
       q7_breach: yesnoValue('q7'),
       q7_details: document.getElementById('q7-text').value.trim(),
-      q7_action: document.getElementById('q7-action').value.trim(),
       q8_sources: multiSelected('q8-chips'),
       q9_safety: scaleValue('q9-scale'),
       q10_gap: document.getElementById('q10-text').value.trim(),
@@ -775,17 +789,29 @@
     btn.textContent = 'Submitting…';
 
     try {
-      // Apps Script Web Apps deployed as "Anyone" don't require a CORS preflight
-      // when we send text/plain. So we stringify and send as plain text.
-      const res = await fetch(SHEETS_ENDPOINT, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(answers)
+      // Flatten device counts into top-level properties for easy filtering
+      const flatDevices = {};
+      Object.entries(DEVICE_KEYS).forEach(([label, key]) => {
+        flatDevices[key] = answers.q1_devices[label] || 0;
       });
-      if (!res.ok) throw new Error('Server returned ' + res.status);
-      const data = await res.json().catch(() => ({}));
-      if (data && data.ok === false) throw new Error(data.error || 'Submission failed');
+      flatDevices.device_total = Object.values(flatDevices).reduce((a, b) => a + b, 0);
+
+      // Tag the person by email so each respondent is a profile in PostHog
+      if (window.posthog && posthog.identify) {
+        posthog.identify(answers.email, { email: answers.email });
+      }
+
+      const eventProps = { ...answers, ...flatDevices };
+      delete eventProps.q1_devices; // we've flattened it
+
+      if (window.posthog && posthog.capture) {
+        posthog.capture('survey_completed', eventProps);
+      } else {
+        throw new Error('PostHog not loaded');
+      }
+
+      // Brief delay so the event is sent before the form unmounts
+      await new Promise(r => setTimeout(r, 300));
 
       document.getElementById('survey-form').style.display = 'none';
       document.getElementById('thankyou').classList.add('visible');
